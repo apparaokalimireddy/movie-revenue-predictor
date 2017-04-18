@@ -1,7 +1,7 @@
 ### Source code for Movie Revenue Prediction Model in R
 
 #### Authors
-- Sampath Yamsani, Venkata Rami Reddy Vanukuri, Sailaja Vuyyuru,  Apparao Kalimireddy
+- Group7
 
 #### How to run the project
 - Open the movie-revenue-predictor.rproj using RStudio.
@@ -18,4 +18,4 @@
 
 #### Code Repository
 - Latest code is available on ICON at https://uiowa.instructure.com/groups/16403/files/folder/movie-revenue-predictor
-- Code is also available at github at https://github.com/apparaokalimireddy/movie-revenue-predictor
+- Code is also available at github at https://github.com/rhawks7/movie-revenue-predictor
