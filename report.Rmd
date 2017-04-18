@@ -1,0 +1,104 @@
+---
+title: "Movie Revenue Prediction Analysis"
+author: "Group 7"
+date: "April 15, 2017"
+output:
+  html_document: default
+params:
+  dat: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r echo=FALSE, warning=FALSE,message=FALSE}
+dat<-params$dat
+if (dat == "NA") {
+  library(rvest)
+  library(ggplot2)
+  library(scales)
+  library(chron)
+  library(timeDate)
+  library(reshape2)
+  source("loadAndPrepare.R")
+  source("regressionAnalysis.R")
+  source("util.R")
+  df <- loadFromNumbers(movieId)
+  dat <- c(movieId, mrAnalysis(df), srAnalysis(df),df)
+}
+movieId <- dat[[1]]
+movie<-movieDisplayText(movieId)
+```
+### Overview
+
+Newly released movies typically follow a trend of going up or down depending on their overall success with the audience. If we only take this trend into account there is good chance that we miss out on seasonality that is associated with the collections. For example, no matter how successful a movie is or not, all movies during their initial weeks, tend to have higher collections during weekends and holidays. So, in this analysis we will make sure to include both general trend and the seasonality in predicting the future revenues.
+
+This report is using first three weeks of daily collections for the movie, **`r movie`** and predicting fourth week revenues.This Report used <http://www.the-numbers.com> as the source for the first three weeks of data. Fourth week revenues are predicted by using Multiple Regression with Dummy Variables for time-series analysis.
+
+#### Three week source data
+
+```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
+dat[[18]][,c("Day", "Date", "Revenues")]
+```
+
+#### Below are key stats and graph from Multiple Regression
+
+```{r echo=FALSE, warning=FALSE,message=FALSE}
+mr_summary<-dat[[8]]
+autocor<-dat[[6]]
+stat_names<-c("R Squared", "Adj R Squared", "Std Error", "Autocorrelation")
+stat_values<-c(mr_summary$r.squared, mr_summary$adj.r.squared, mr_summary$sigma, autocor)
+keystats<-data.frame(stat_names, stat_values)
+
+keystats
+dat[[2]]
+
+```
+
+#### Predicted data for the 4th week for the movie *`r movie`* from Multiple Regression Analysis model
+
+```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
+df_pmr <- subset(dat[[5]], Day > 21)
+cols <- c("Day","PredictedRevenues")
+df_pmr <- df_pmr[,cols]
+row.names(df_pmr) <- NULL
+df_pmr
+```
+
+#### Fourth week of actual daily collections for the movie *`r movie`* from <http://www.the-numbers.com> 
+
+```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
+dfa <-loadFromNumbers( samples = 28)
+dfa <- subset(dfa, Day > 21)
+cols <- c("Date","Day","Revenues")
+dfa <- dfa[,cols]
+row.names(dfa) <- NULL
+dfa
+```
+
+#### Fourth Week revenue graph for the movie *`r movie`* actuals from <http://www.the-numbers.com> vs predicted revenue from Multiple Regression
+
+
+```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
+dfm <-merge(dfa,df_pmr,by="Day",all=TRUE)
+pregraph <-
+    qplot(
+      x = Day,
+      data = dfm,
+      ylab = "Revenues",
+      binwidth = 1
+    ) +
+    theme(plot.title = element_text(hjust = 0.5,face = "bold")) +
+    geom_point(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
+    geom_line(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
+    geom_point(aes(y = PredictedRevenues, colour = "Predicted")) +
+    geom_line(aes(y = PredictedRevenues, colour = "Predicted"))
+  pregraph <-
+    pregraph + scale_y_continuous(name = "Revenues", labels = dollar)
+  pregraph <-
+    pregraph + scale_x_continuous(name = "Day", breaks = round(seq(min(df_pmr$Day), max(df_pmr$Day), by = 2), 2))
+  pregraph <-
+    pregraph + ggtitle(" Actual VS Predicted Revenues for 4th week ")
+  pregraph
+ 
+```

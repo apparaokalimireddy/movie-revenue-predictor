@@ -10,7 +10,9 @@ srAnalysis<-function(df) {
       y = df$Revenues,
       geom = "point",
       ylab = "Revenues"
-    ) + geom_line()
+    ) + geom_line() + theme(plot.title = element_text(hjust = 0.5,face = "bold"))
+    simple <-
+    simple + ggtitle("Revenue Trend")
   simple <-
     simple + scale_y_continuous(name = "Revenues", labels = dollar)
   simple <-
@@ -46,6 +48,7 @@ srAnalysis<-function(df) {
   # Based on this equation/model, calculate predicted values
   df_psr <- predictRevenues(sr_model, df)
   
+  sr_summary<-summary.lm(sr_model)
   #If residuals are highly auto autocorrelated, it means there is a potential seanoality that is missed in the model
   # Typically auto correlation of greater than .30 means it highly correlated, hence not a
   # good regression model.
@@ -54,12 +57,18 @@ srAnalysis<-function(df) {
   
   # Create residual plot - If you notice a visible pattern not a good indication
   sr_residual_plot <-
-    qplot(df$Day, sr_model$residuals, ylab = "Residuals", xlab = "Day") + geom_abline(aes(slope =
-                                                                                            0, intercept = 0))
+    qplot(df$Day, sr_model$residuals, ylab = "Residuals", xlab = "Day") + geom_abline(aes(slope = 0, intercept = 0)) +
+    ggtitle("Residual Plot") +
+    theme(plot.title = element_text(hjust = 0.5,face = "bold"))
   # Create histogram of residuals, if it doesn't look "normal", not good.
   sr_hist <-
-    qplot(sr_model$residuals, geom = "histogram", binwidth = 1000000)
-  srData<-list(simple, sr_hist, sr_residual_plot, df_psr, autocorr_sr, sr_model, df)
+    qplot(sr_model$residuals, geom = "histogram", binwidth = 1000000)+
+    scale_y_continuous(name = "Count") +
+    scale_x_continuous(name = "Residuals") +
+    ggtitle("Histogram of Resuduals") +
+    theme(plot.title = element_text(hjust = 0.5,face = "bold"))
+  
+    srData<-list(simple, sr_hist, sr_residual_plot, df_psr, autocorr_sr, sr_summary, sr_model, df)
   srData
 }
 ###############################################################################
@@ -91,11 +100,17 @@ mrAnalysis<-function(df) {
   df_pmr <- predictRevenues(mr_model, df, multipleReg = TRUE)
   # Create residual plot - If you notice a visible pattern not a good indication
   mr_residual_plot <-
-    qplot(df$Day, mr_model$residuals, ylab = "Residuals", xlab = "Day") + geom_abline(aes(slope =
-                                                                                            0, intercept = 0))
+    qplot(df$Day, mr_model$residuals, ylab = "Residuals", xlab = "Day") + geom_abline(aes(slope = 0, intercept = 0)) +
+    ggtitle("Residual Plot") +
+    theme(plot.title = element_text(hjust = 0.5,face = "bold"))
+  
   # Create histogram of residuals, if it doesn't look "normal", not good.
   mr_hist <-
-    qplot(mr_model$residuals, geom = "histogram", binwidth = 0.1)
+    qplot(mr_model$residuals, geom = "histogram", binwidth = 0.1) +
+    ggtitle("Histogram of Resuduals") +
+    scale_y_continuous(name = "Count") +
+    scale_x_continuous(name = "Residuals") +
+    theme(plot.title = element_text(hjust = 0.5,face = "bold"))
   # Plot the Actual and Predcited Revenues
   multiple <-
     qplot(
