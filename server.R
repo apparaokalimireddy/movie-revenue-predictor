@@ -12,7 +12,7 @@ library(chron)
 library(timeDate)
 source("loadAndPrepare.R")
 source("regressionAnalysis.R")
-source("util.R")
+
 
 shinyServer(function(input, output) {
   analysisData <- reactive({
