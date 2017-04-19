@@ -57,3 +57,8 @@ movieDisplayText<-function(movieId) {
   movie
 }
 
+# Function: returns a random movie name
+randomMovie<-function() {
+  sample(c('trolls', 'storks', 'grudge match', 'american sniper', 'Deepwater Horizon'), 1)
+}
+

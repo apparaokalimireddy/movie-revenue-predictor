@@ -14,7 +14,7 @@ shinyUI(fluidPage(
 
   sidebarLayout(
     sidebarPanel(
-      textInput("searchterm", "Enter Movie Name:", "trolls"),
+      textInput("searchterm", "Enter Movie Name:", randomMovie()),
       submitButton("Submit"),
       htmlOutput("sideImage", align="middle")
       ),
