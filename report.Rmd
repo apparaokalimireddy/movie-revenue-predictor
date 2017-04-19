@@ -68,37 +68,45 @@ df_pmr
 #### Fourth week of actual daily collections for the movie *`r movie`* from <http://www.the-numbers.com> 
 
 ```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
-dfa <-loadFromNumbers( samples = 28)
-dfa <- subset(dfa, Day > 21)
-cols <- c("Date","Day","Revenues")
-dfa <- dfa[,cols]
-row.names(dfa) <- NULL
-dfa
+err.handler.na<-function(err) NA
+dfa <-tryCatch(loadFromNumbers(movieId = movieId, samples = 28), error=err.handler.na)
+if (!is.na(dfa)) {
+  dfa <- subset(dfa, Day > 21)
+  cols <- c("Date","Day","Revenues")
+  dfa <- dfa[,cols]
+  row.names(dfa) <- NULL
+  dfa
+} else {
+  sprintf("Fourth week data not available")
+}
 ```
 
 #### Fourth Week revenue graph for the movie *`r movie`* actuals from <http://www.the-numbers.com> vs predicted revenue from Multiple Regression
 
 
 ```{r echo=FALSE, comment=NULL,warning=FALSE,message=FALSE}
-dfm <-merge(dfa,df_pmr,by="Day",all=TRUE)
-pregraph <-
-    qplot(
-      x = Day,
-      data = dfm,
-      ylab = "Revenues",
-      binwidth = 1
-    ) +
-    theme(plot.title = element_text(hjust = 0.5,face = "bold")) +
-    geom_point(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
-    geom_line(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
-    geom_point(aes(y = PredictedRevenues, colour = "Predicted")) +
-    geom_line(aes(y = PredictedRevenues, colour = "Predicted"))
+if (!is.na(dfa)) {
+  dfm <-merge(dfa,df_pmr,by="Day",all=TRUE)
   pregraph <-
-    pregraph + scale_y_continuous(name = "Revenues", labels = dollar)
-  pregraph <-
-    pregraph + scale_x_continuous(name = "Day", breaks = round(seq(min(df_pmr$Day), max(df_pmr$Day), by = 2), 2))
-  pregraph <-
-    pregraph + ggtitle(" Actual VS Predicted Revenues for 4th week ")
-  pregraph
- 
+      qplot(
+        x = Day,
+        data = dfm,
+        ylab = "Revenues",
+        binwidth = 1
+      ) +
+      theme(plot.title = element_text(hjust = 0.5,face = "bold")) +
+      geom_point(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
+      geom_line(aes(y = Revenues, colour = "Actual"), na.rm = TRUE) +
+      geom_point(aes(y = PredictedRevenues, colour = "Predicted")) +
+      geom_line(aes(y = PredictedRevenues, colour = "Predicted"))
+    pregraph <-
+      pregraph + scale_y_continuous(name = "Revenues", labels = dollar)
+    pregraph <-
+      pregraph + scale_x_continuous(name = "Day", breaks = round(seq(min(df_pmr$Day), max(df_pmr$Day), by = 2), 2))
+    pregraph <-
+      pregraph + ggtitle(" Actual VS Predicted Revenues for 4th week ")
+    pregraph
+} else {
+  sprintf("Fourth week data not available")
+} 
 ```
