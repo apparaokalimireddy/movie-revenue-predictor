@@ -19,7 +19,9 @@ shinyServer(function(input, output) {
     err.handler <- function(err){
       stop("Unable to retrieve data or data do not have enough samples")
     }
-    movieId<-numbersMovieId(input$searchterm)
+    result<-searchOnNumbers(input$searchterm)
+    movieId<-numbersMovieId(result)
+    
     df <- tryCatch(loadFromNumbers(movieId), error=err.handler)
     c(movieId, mrAnalysis(df), srAnalysis(df), df)
   })

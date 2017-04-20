@@ -35,14 +35,13 @@ searchOnNumbers <- function(searchterm) {
   url<-paste("http://www.the-numbers.com/search?searchterm=", searchterm, "&searchtype=allmatches", sep="")
   pg <- read_html(url) # Download webpage
   tb <- html_table(pg, fill=TRUE)
-  result<-tb[[2]]$Movie
-  result<-result[!is.na(result)] # Remove NAs
-#  ddf<-data.frame(MovieId=gsub(" ", "-", gsub("[\\(\\)]", "", regmatches(result, gregexpr("\\(.*?\\)", result)))))
-  y<-strsplit(result, "(", fixed = TRUE)
-  ddf <- data.frame(matrix(unlist(y), nrow=length(y), byrow=T),stringsAsFactors=FALSE)
-  ddf$X2<-gsub(")", "", ddf$X2, fixed = TRUE)
-  ddf$X2<-gsub(" ", "-", ddf$X2, fixed = TRUE)
-  ddf
+  if (length(tb[[2]]$Movie) == 0) {
+    return(c(searchterm))
+  } else {
+    result<-tb[[2]]$Movie
+    result<-result[!is.na(result)] # Remove NAs
+    result<-gsub( " *\\(.*?\\) *", "", result)
+  }
 }
 #
 # Prepare df with Dummy variables for hoildays and weekends
